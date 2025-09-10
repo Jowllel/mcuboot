@@ -16,34 +16,15 @@
 BOOT_LOG_MODULE_REGISTER(esm);
 
 
-void HAL_PWR_EnterSTANDBYMode(void)
-{
- /* Select STANDBY mode */
- SET_BIT(PWR->PMCR, PWR_PMCR_LPMS);
-
- /* Set SLEEPDEEP bit of Cortex System Control Register */
- SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
-
- /* Wait For all memory accesses to complete before continuing */
- __DSB();
-
- /* Ensure that the processor pipeline is flushed */
- __ISB();
-
- /* Wait For Interrupt Request */
- __WFI();
-}
-
 void esm_boot_routine()
 {
 	util_nvs_init();
+	base_pwr_init();
 
 	if(util_nvs_low_power_state_get())
 	{
 		LOG_INF("Entering Low Power Mode !!!!");
 		util_nvs_low_power_state_set(LOW_POWER_STATE_OFF);
-		
-		base_pwr_init();
 
 		base_pwr_set(1, false);
 		base_pwr_set(2, false);
@@ -51,6 +32,15 @@ void esm_boot_routine()
 		
 		base_pwr_set(0, false);
 		
-		HAL_PWR_EnterSTANDBYMode();
+		//Enter Standby Mode
+		SET_BIT(PWR->PMCR, PWR_PMCR_LPMS);
+		SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
+		__DSB();
+		__ISB();
+		__WFI();
+		
+	} else {
+		
+		base_pwr_set(0, true);
 	}
 }
