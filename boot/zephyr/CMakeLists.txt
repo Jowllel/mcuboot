@@ -117,6 +117,7 @@ zephyr_library_include_directories(${BOOT_DIR}/esm)
 zephyr_library_sources(
   ${BOOT_DIR}/esm/esm.c
   ${BOOT_DIR}/esm/nvs.c
+  ${BOOT_DIR}/esm/base_pwr.c
   )
 
 if(DEFINED CONFIG_BOOT_ENCRYPT_X25519 AND DEFINED CONFIG_BOOT_ED25519_PSA)
