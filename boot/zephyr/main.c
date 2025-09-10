@@ -48,6 +48,8 @@
 #include "bootutil/mcuboot_status.h"
 #include "flash_map_backend/flash_map_backend.h"
 
+#include "esm.h"
+
 /* Check if Espressif target is supported */
 #ifdef CONFIG_SOC_FAMILY_ESPRESSIF_ESP32
 
@@ -490,15 +492,10 @@ static void boot_serial_enter()
 }
 #endif
 
-
-static const struct gpio_dt_spec en_pwr_p_dat =
-    GPIO_DT_SPEC_GET_OR(DT_ALIAS(enpwrpdat), gpios, {0});
-static const struct gpio_dt_spec en_pwr_p_clk =
-    GPIO_DT_SPEC_GET_OR(DT_ALIAS(enpwrpclk), gpios, {0});
-	
-
 int main(void)
 {
+	esm_boot_routine();
+	
     struct boot_rsp rsp;
     int rc;
 #if defined(CONFIG_BOOT_USB_DFU_GPIO) || defined(CONFIG_BOOT_USB_DFU_WAIT)
@@ -511,38 +508,6 @@ int main(void)
 
 #if !defined(MCUBOOT_DIRECT_XIP)
     BOOT_LOG_INF("Starting bootloader");
-	
-	int err = gpio_pin_configure_dt(&en_pwr_p_dat, GPIO_OUTPUT_INACTIVE);
-    if (err != 0) {
-        BOOT_LOG_ERR("Configuring GPIO pin failed: %d\n", err);
-    }
-
-    if (!gpio_is_ready_dt(&en_pwr_p_clk)) {
-        BOOT_LOG_ERR("The load switch pin GPIO port is not ready.\n");
-    }
-
-    err = gpio_pin_configure_dt(&en_pwr_p_clk, GPIO_OUTPUT_INACTIVE);
-    if (err != 0) {
-        BOOT_LOG_ERR("Configuring GPIO pin failed: %d\n", err);
-    }
-	
-	err = gpio_pin_set_dt(&en_pwr_p_dat, 1);
-	if (err != 0) {
-		BOOT_LOG_ERR("Setting GPIO pin level failed: %d\n", err);
-	}
-	k_usleep(1);
-
-	err = gpio_pin_set_dt(&en_pwr_p_clk, 1);
-	if (err != 0) {
-		BOOT_LOG_ERR("Setting GPIO pin level failed: %d\n", err);
-	}
-	k_usleep(1);
-
-	err = gpio_pin_set_dt(&en_pwr_p_clk, 0);
-	if (err != 0) {
-		BOOT_LOG_ERR("Setting GPIO pin level failed: %d\n", err);
-	}
-	
 #else
     BOOT_LOG_INF("Starting Direct-XIP bootloader");
 #endif
