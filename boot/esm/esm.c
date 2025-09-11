@@ -21,26 +21,29 @@ void esm_boot_routine()
 	util_nvs_init();
 	base_pwr_init();
 
-	if(util_nvs_low_power_state_get())
+	switch(util_nvs_low_power_state_get())
 	{
-		LOG_INF("Entering Low Power Mode !!!!");
-		util_nvs_low_power_state_set(LOW_POWER_STATE_OFF);
+		case LOW_POWER_STATE_TRIG:
+			LOG_INF("Entering Low Power Mode !!!!");
+			util_nvs_low_power_state_set(LOW_POWER_STATE_ON);
 
-		base_pwr_set(1, false);
-		base_pwr_set(2, false);
-		base_pwr_set(3, false);
-		
-		base_pwr_set(0, false);
-		
-		//Enter Standby Mode
-		SET_BIT(PWR->PMCR, PWR_PMCR_LPMS);
-		SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
-		__DSB();
-		__ISB();
-		__WFI();
-		
-	} else {
-		
-		base_pwr_set(0, true);
+			base_pwr_set(1, false);
+			base_pwr_set(2, false);
+			base_pwr_set(3, false);
+			
+			base_pwr_set(0, false);
+			
+			//Enter Standby Mode
+			SET_BIT(PWR->PMCR, PWR_PMCR_LPMS);
+			SET_BIT(SCB->SCR, ((uint32_t)SCB_SCR_SLEEPDEEP_Msk));
+			__DSB();
+			__ISB();
+			__WFI();
+			
+			break;
+			
+		case LOW_POWER_STATE_ON:
+			base_pwr_set(0, true);
+			break;
 	}
 }

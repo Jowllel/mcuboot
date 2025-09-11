@@ -12,8 +12,9 @@
 #include "zephyr/kernel.h"
 #include "zephyr/fs/nvs.h"
 
-#define LOW_POWER_STATE_OFF 0
+#define LOW_POWER_STATE_NORMAL 0
 #define LOW_POWER_STATE_TRIG 1
+#define LOW_POWER_STATE_ON 2
 
 void util_nvs_init(void);
 void util_nvs_low_power_state_set(uint8_t state);
