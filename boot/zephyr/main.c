@@ -48,6 +48,8 @@
 #include "bootutil/mcuboot_status.h"
 #include "flash_map_backend/flash_map_backend.h"
 
+#include "esm.h"
+
 /* Check if Espressif target is supported */
 #ifdef CONFIG_SOC_FAMILY_ESPRESSIF_ESP32
 
@@ -492,6 +494,8 @@ static void boot_serial_enter()
 
 int main(void)
 {
+	esm_boot_routine();
+	
     struct boot_rsp rsp;
     int rc;
 #if defined(CONFIG_BOOT_USB_DFU_GPIO) || defined(CONFIG_BOOT_USB_DFU_WAIT)

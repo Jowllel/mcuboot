@@ -111,6 +111,13 @@ zephyr_library_sources(
   ${BOOT_DIR}/bootutil/src/bootutil_misc.c
   ${BOOT_DIR}/bootutil/src/fault_injection_hardening.c
   )
+  
+# ESM Specific Includes
+zephyr_library_include_directories(${BOOT_DIR}/esm)
+zephyr_library_sources(
+  ${BOOT_DIR}/esm/esm.c
+  ${BOOT_DIR}/esm/base_pwr.c
+  )
 
 if(DEFINED CONFIG_BOOT_ENCRYPT_X25519 AND DEFINED CONFIG_BOOT_ED25519_PSA)
   zephyr_library_sources(${BOOT_DIR}/bootutil/src/encrypted_psa.c)
