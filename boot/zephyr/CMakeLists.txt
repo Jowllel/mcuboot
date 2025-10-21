@@ -16,7 +16,7 @@ endif()
 # find_package(Zephyr) in order to load application boilerplate:
 # http://docs.zephyrproject.org/application/application.html
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(NONE)
+project(MCUBOOT)
 
 # Path to "boot" subdirectory of repository root.
 get_filename_component(BOOT_DIR ${APPLICATION_SOURCE_DIR} DIRECTORY)
