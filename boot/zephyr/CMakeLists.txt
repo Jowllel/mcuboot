@@ -116,6 +116,7 @@ zephyr_library_sources(
 zephyr_library_include_directories(${BOOT_DIR}/esm)
 zephyr_library_sources(
   ${BOOT_DIR}/esm/esm.c
+  ${BOOT_DIR}/esm/sd_card.c
   ${BOOT_DIR}/esm/base_pwr.c
   )
 
