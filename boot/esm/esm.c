@@ -70,6 +70,14 @@ int boot_write_img_slot0_confirmed(void)
 	return rc;
 }
 
+int turn_on_pwr_p() {
+
+	base_pwr_init();
+	base_pwr_set(0, true);
+
+	return 0;
+}
+SYS_INIT_NAMED(TURN_ON_PWR_P, turn_on_pwr_p, POST_KERNEL, 41);
 
 
 void esm_boot_routine()
@@ -129,8 +137,4 @@ void esm_boot_routine()
 		LOG_INF("Requested Firmware Upgrade");
 		boot_request_upgrade(BOOT_UPGRADE_TEST);
 	}
-
-
-	base_pwr_init();
-	base_pwr_set(0, true);
 }
