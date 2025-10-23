@@ -17,6 +17,8 @@
 #include <zephyr/dfu/flash_img.h>
 #include <zephyr/dfu/mcuboot.h>
 
+#include "src/bootutil_priv.h"
+
 
 BOOT_LOG_MODULE_REGISTER(esm);
 
@@ -24,9 +26,58 @@ BOOT_LOG_MODULE_REGISTER(esm);
 
 uint8_t img_buf[256];
 
+bool boot_is_img_slot0_confirmed(void)
+{
+	struct boot_swap_state state;
+	const struct flash_area *fa;
+	int rc;
+
+	rc = flash_area_open(FIXED_PARTITION_ID(slot0_partition), &fa);
+	if (rc) {
+		return false;
+	}
+
+	rc = boot_read_swap_state(fa, &state);
+	if (rc != 0) {
+		return false;
+	}
+
+	if (state.magic == BOOT_MAGIC_UNSET) {
+		/* This is initial/preprogramed image.
+		 * Such image can neither be reverted nor physically confirmed.
+		 * Treat this image as confirmed which ensures consistency
+		 * with `boot_write_img_confirmed...()` procedures.
+		 */
+		return true;
+	}
+
+	return state.image_ok == BOOT_FLAG_SET;
+}
+
+int boot_write_img_slot0_confirmed(void)
+{
+	const struct flash_area *fa;
+	int rc = 0;
+
+	if (flash_area_open(FIXED_PARTITION_ID(slot0_partition), &fa) != 0) {
+		return -EIO;
+	}
+
+	rc = boot_set_next(fa, true, true);
+
+	flash_area_close(fa);
+
+	return rc;
+}
+
+
+
 void esm_boot_routine()
 {
-	LOG_INF("ESM Boot Routine:");
+	if (!boot_is_img_slot0_confirmed()) {
+		LOG_INF("Slot0 IMG Confirmed.");
+		boot_write_img_slot0_confirmed();
+	}
 
 	util_sd_card_init();
 
@@ -76,7 +127,7 @@ void esm_boot_routine()
 		if (fs_unlink(FW_FILE_PATH)) LOG_ERR("Can't delete old fw_update file");
 
 		LOG_INF("Requested Firmware Upgrade");
-		boot_request_upgrade(BOOT_UPGRADE_PERMANENT);
+		boot_request_upgrade(BOOT_UPGRADE_TEST);
 	}
 
 
