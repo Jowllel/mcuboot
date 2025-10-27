@@ -83,3 +83,17 @@ Use the following links to join or see more about the project:
 * [Our developer mailing list](https://groups.io/g/MCUBoot)
 * [Our Discord channel](https://discord.com/channels/1106321706588577904/1106322802308550716) <br />
   Get [your invite](https://discord.com/invite/5PpXhvda5p)
+
+# ESM Fork Info
+
+## How to build / develop the mcuboot fork for the esm bmb fw project
+
+1. Install the ESM BMB FW according to the readme in the [esm-bmb-fw](https://gitlab.seismo.ethz.ch/elab/esm-bmb-fw) repository.
+2. Open the mcuboot project in CLion. Using the following path: `esm-bmb-fw/bootloader/mcuboot/boot/zephyr`
+3. After opening the project, the "Open Project Wizard may pop up". In it click on "Add Environment" and then select the virtual environment activate batch file. e.g.: _"C:\Users\jschaller\esm-bmb-fw\.venv\Scripts\activate.bat"_
+4. Go to: "Settings -> Build, Execution, Deployment -> Embedded Development -> West" and add the following line to the Build options in the Advanced Settings.
+   ```
+   --board=esm_bmb -- -DBOARD_ROOT=..\..\..\..\_FW_ESM_BMB -DEXTRA_CONF_FILE=..\..\..\..\_FW_ESM_BMB\sysbuild\mcuboot.conf -DDTC_OVERLAY_FILE=../../../../_FW_ESM_BMB/sysbuild/mcuboot.overlay -DCONFIG_BOOT_SIGNATURE_KEY_FILE=\"../../_FW_ESM_BMB/esm_sign_key.pem\"
+   ```
+5. Click okay and wait until the west loading bar on the bottom is done.
+
