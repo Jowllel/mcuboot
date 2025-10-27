@@ -16,7 +16,7 @@
 #include "zephyr/storage/flash_map.h"
 #include <zephyr/dfu/flash_img.h>
 #include <zephyr/dfu/mcuboot.h>
-
+#include "nvs.h"
 #include "src/bootutil_priv.h"
 
 
@@ -82,7 +82,10 @@ SYS_INIT_NAMED(TURN_ON_PWR_P, turn_on_pwr_p, POST_KERNEL, 41);
 
 void esm_boot_routine()
 {
-	if (!boot_is_img_slot0_confirmed()) {
+	util_nvs_init();
+
+	if (util_nvs_image_check_state_get() == IMAGE_CHECK_STATE_TESTED_OK) {
+		util_nvs_image_check_state_set(IMAGE_CHECK_STATE_CONFIRMED);
 		LOG_INF("Slot0 IMG Confirmed.");
 		boot_write_img_slot0_confirmed();
 	}
@@ -118,7 +121,7 @@ void esm_boot_routine()
 
 		LOG_INF("Moving Firmware Image from SD-Card to slot1");
 		uint32_t size = 0;
-		while (size = fs_read(&file, img_buf, sizeof(img_buf))) {
+		while ((size = fs_read(&file, img_buf, sizeof(img_buf)))) {
 			// LOG_INF("Reading FW file %d bytes", size);
 
 			err = flash_img_buffered_write(&ctx, img_buf, size, false);
@@ -136,5 +139,6 @@ void esm_boot_routine()
 
 		LOG_INF("Requested Firmware Upgrade");
 		boot_request_upgrade(BOOT_UPGRADE_TEST);
+		util_nvs_image_check_state_set(IMAGE_CHECK_STATE_TEST);
 	}
 }
