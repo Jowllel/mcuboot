@@ -18,6 +18,7 @@
 #include <zephyr/dfu/mcuboot.h>
 #include "nvs.h"
 #include "src/bootutil_priv.h"
+#include "zephyr/drivers/mdio.h"
 
 
 BOOT_LOG_MODULE_REGISTER(esm);
@@ -79,9 +80,16 @@ int turn_on_pwr_p() {
 }
 SYS_INIT_NAMED(TURN_ON_PWR_P, turn_on_pwr_p, POST_KERNEL, 41);
 
+const struct device *const mdio = DEVICE_DT_GET(DT_ALIAS(mdio));
+uint16_t reg;
 
 void esm_boot_routine()
 {
+	//Turn off the Ethernet Phy, so the LEDs dont light up during update
+	mdio_read(mdio, 0x1, 0x0, &reg);
+	reg |=  0x1 << 11;
+	mdio_write(mdio, 0x1, 0x0, reg);
+
 	util_nvs_init();
 
 	if (util_nvs_image_check_state_get() == IMAGE_CHECK_STATE_TESTED_OK) {
