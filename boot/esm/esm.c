@@ -7,6 +7,7 @@
  ***************************************************/
 
 #include <zephyr/kernel.h>
+#include <stdio.h>
 
 #include "bootutil/bootutil_log.h"
 
@@ -19,6 +20,8 @@
 #include "nvs.h"
 #include "src/bootutil_priv.h"
 #include "zephyr/drivers/mdio.h"
+#include "zephyr/drivers/rtc.h"
+#include "zephyr/logging/log_output_custom.h"
 
 
 BOOT_LOG_MODULE_REGISTER(esm);
@@ -83,8 +86,28 @@ SYS_INIT_NAMED(TURN_ON_PWR_P, turn_on_pwr_p, POST_KERNEL, 41);
 const struct device *const mdio = DEVICE_DT_GET(DT_ALIAS(mdio));
 uint16_t reg;
 
+char timestamp_long[50] = "[2020-09-27 18:30:10.599]";
+
+const struct device *const rtc      = DEVICE_DT_GET(DT_ALIAS(rtc));
+
+char *esm_clock_gettimestamp_long(void) {
+	struct rtc_time rtctime;
+	rtc_get_time(rtc, &rtctime);
+	snprintf(timestamp_long, sizeof(timestamp_long), "[%04d-%02d-%02d %02d:%02d:%02d.%03d]", rtctime.tm_year + 1900, rtctime.tm_mon + 1, rtctime.tm_mday, rtctime.tm_hour, rtctime.tm_min, rtctime.tm_sec, rtctime.tm_nsec / 1000000);
+	return timestamp_long;
+}
+
+int custom_timestamp_formatter(const struct log_output* output,
+							   const log_timestamp_t timestamp,
+							   const log_timestamp_printer_t printer) {
+	return printer(output, "%s ", esm_clock_gettimestamp_long());
+	// return printer(output, "");
+}
+
 void esm_boot_routine()
 {
+	log_custom_timestamp_set(custom_timestamp_formatter);
+
 	//Turn off the Ethernet Phy, so the LEDs dont light up during update
 	mdio_read(mdio, 0x1, 0x0, &reg);
 	reg |=  0x1 << 11;

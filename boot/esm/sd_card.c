@@ -15,6 +15,7 @@
 
 #include "sd_card.h"
 
+#include "esm.h"
 #include "zephyr/drivers/rtc.h"
 
 
@@ -86,16 +87,17 @@ int  util_sd_card_init(void) {
 }
 
 
-// uint32_t get_fattime (void)
-// {
-//
-//     struct rtc_time rtctime;
-//     rtc_get_time(rtc, &rtctime);
-//
-//     return (rtctime.tm_year - 80) << 25 |
-//            (rtctime.tm_mon + 1) << 21 |
-//            (rtctime.tm_mday) << 16 |
-//            (rtctime.tm_hour) << 11 |
-//            (rtctime.tm_min) << 5 |
-//            (rtctime.tm_sec) >> 1;
-// }
+
+uint32_t get_fattime (void)
+{
+
+    struct rtc_time rtctime;
+    rtc_get_time(rtc, &rtctime);
+
+    return (rtctime.tm_year - 80) << 25 |
+           (rtctime.tm_mon + 1) << 21 |
+           (rtctime.tm_mday) << 16 |
+           (rtctime.tm_hour) << 11 |
+           (rtctime.tm_min) << 5 |
+           (rtctime.tm_sec) >> 1;
+}
