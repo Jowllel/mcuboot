@@ -119,6 +119,8 @@ zephyr_library_sources(
   ${BOOT_DIR}/esm/sd_card.c
   ${BOOT_DIR}/esm/base_pwr.c
   ${BOOT_DIR}/esm/nvs.c
+  ${BOOT_DIR}/esm/devices.c
+  ${BOOT_DIR}/esm/gpios.c
   )
 
 if(DEFINED CONFIG_BOOT_ENCRYPT_X25519 AND DEFINED CONFIG_BOOT_ED25519_PSA)

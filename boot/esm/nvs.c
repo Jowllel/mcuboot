@@ -13,13 +13,14 @@
 #include "zephyr/drivers/flash.h"
 #include "zephyr/logging/log.h"
 #include <zephyr/storage/flash_map.h>
+#include "devices.h"
 
 LOG_MODULE_REGISTER(util_nvs, LOG_LEVEL_DBG);
 
 static struct nvs_fs fs;
 
 #define NVS_PARTITION		       storage_partition
-#define NVS_PARTITION_DEVICE	 DEVICE_DT_GET(DT_ALIAS(stmflash))
+#define NVS_PARTITION_DEVICE	 stmflash
 #define NVS_PARTITION_OFFSET	 FIXED_PARTITION_OFFSET(NVS_PARTITION)
 #define NVS_PARTITION_SIZE	   FIXED_PARTITION_SIZE(NVS_PARTITION)
 

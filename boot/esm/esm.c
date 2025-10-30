@@ -17,6 +17,9 @@
 #include "zephyr/storage/flash_map.h"
 #include <zephyr/dfu/flash_img.h>
 #include <zephyr/dfu/mcuboot.h>
+
+#include "devices.h"
+#include "gpios.h"
 #include "nvs.h"
 #include "src/bootutil_priv.h"
 #include "zephyr/drivers/mdio.h"
@@ -88,7 +91,6 @@ uint16_t reg;
 
 char timestamp_long[50] = "[2020-09-27 18:30:10.599]";
 
-const struct device *const rtc      = DEVICE_DT_GET(DT_ALIAS(rtc));
 
 char *esm_clock_gettimestamp_long(void) {
 	struct rtc_time rtctime;

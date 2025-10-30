@@ -10,6 +10,5 @@
 #define ESM_H
 
 void esm_boot_routine();
-extern const struct device *const rtc;
 
 #endif //ESM_H

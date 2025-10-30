@@ -11,7 +11,8 @@
 
 #include "zephyr/kernel.h"
 
-void base_pwr_init(void);
+int base_pwr_init(void);
+
 void base_pwr_set(int id, bool state);
 
 #endif //BASE_PWR_H

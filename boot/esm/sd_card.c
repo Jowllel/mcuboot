@@ -15,6 +15,7 @@
 
 #include "sd_card.h"
 
+#include "devices.h"
 #include "esm.h"
 #include "zephyr/drivers/rtc.h"
 
