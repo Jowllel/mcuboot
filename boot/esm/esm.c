@@ -20,6 +20,7 @@
 
 #include "devices.h"
 #include "gpios.h"
+#include "led.h"
 #include "nvs.h"
 #include "src/bootutil_priv.h"
 #include "zephyr/drivers/mdio.h"
@@ -84,9 +85,33 @@ int turn_on_pwr_p() {
 
 	return 0;
 }
-SYS_INIT_NAMED(TURN_ON_PWR_P, turn_on_pwr_p, POST_KERNEL, 41);
 
-const struct device *const mdio = DEVICE_DT_GET(DT_ALIAS(mdio));
+bool state_led = false;
+bool updating = false;
+
+void state_led_timer_cb(struct k_timer *timer) {
+	if (state_led) {
+		util_led_state_set(LED_ORANGE);
+		state_led = false;
+	} else {
+		if (updating) util_led_state_set(LED_GREEN);
+		else util_led_state_set(LED_ORANGE);
+		state_led = true;
+	}
+}
+
+K_TIMER_DEFINE(state_led_timer, state_led_timer_cb, NULL);
+
+int leds_init() {
+	util_led_power_set(LED_GREEN);
+	k_timer_start(&state_led_timer, K_NO_WAIT, K_MSEC(200));
+	return 0;
+}
+
+SYS_INIT_NAMED(GPIO_INIT, gpios_init, POST_KERNEL, 41);
+SYS_INIT_NAMED(TURN_ON_PWR_P, turn_on_pwr_p, POST_KERNEL, 42);
+SYS_INIT_NAMED(LEDS_INIT, leds_init, POST_KERNEL, 43);
+
 uint16_t reg;
 
 char timestamp_long[50] = "[2020-09-27 18:30:10.599]";
@@ -134,6 +159,7 @@ void esm_boot_routine()
 	struct fs_dirent dirent;
 	if (!fs_stat(FW_FILE_PATH, &dirent)) {
 		LOG_INF("Detected Firmware to update...");
+		updating = true;
 
 		// Update FW
 

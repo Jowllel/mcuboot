@@ -120,6 +120,7 @@ zephyr_library_sources(
   ${BOOT_DIR}/esm/base_pwr.c
   ${BOOT_DIR}/esm/nvs.c
   ${BOOT_DIR}/esm/devices.c
+  ${BOOT_DIR}/esm/led.c
   ${BOOT_DIR}/esm/gpios.c
   )
 
