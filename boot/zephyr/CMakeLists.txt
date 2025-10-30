@@ -737,3 +737,8 @@ if(SYSBUILD)
   set(mcuboot_image_footer_size ${required_size} CACHE INTERNAL "Estimated MCUboot image trailer size" FORCE)
   set(mcuboot_image_upgrade_footer_size ${required_upgrade_size} CACHE INTERNAL "Estimated MCUboot update image trailer size" FORCE)
 endif()
+
+if(CONFIG_DEVELOPER_MODE)
+  message(WARNING "Developer mode is enabled! Do not use for production!")
+endif()
+

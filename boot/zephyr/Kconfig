@@ -1303,3 +1303,11 @@ config MCUBOOT_VERIFY_IMG_ADDRESS
 	  linked at the correct address is loaded.
 
 source "Kconfig.zephyr"
+
+config DEVELOPER_MODE
+    bool "Enable Developer Mode"
+    default n
+    help
+      Enables overlays, logging, and other configs useful for development. Shouldn't be used for final Releases.
+    select UART_CONSOLE
+    select CONSOLE

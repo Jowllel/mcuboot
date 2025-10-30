@@ -106,6 +106,11 @@ int custom_timestamp_formatter(const struct log_output* output,
 
 void esm_boot_routine()
 {
+	#if defined(CONFIG_DEVELOPER_MODE)
+		LOG_WRN("Developer Mode Enabled");
+	#endif
+
+
 	log_custom_timestamp_set(custom_timestamp_formatter);
 
 	//Turn off the Ethernet Phy, so the LEDs dont light up during update
