@@ -77,12 +77,7 @@ int  util_sd_card_init(void) {
         LOG_ERR("Mount ERROR!");
     }
 
-    struct fs_dirent dir;
-    if (fs_stat(DISK_MOUNT_PT "/system_logs", &dir) == -ENOENT) {
-        fs_mkdir(DISK_MOUNT_PT "/system_logs");
-    }
-
-    // log_backend_enable(log_backend_get_by_name("log_backend_fs"), NULL, LOG_LEVEL_DBG);
+    log_backend_enable(log_backend_get_by_name("log_backend_fs"), NULL, LOG_LEVEL_DBG);
     return 0;
 }
 

@@ -494,8 +494,6 @@ static void boot_serial_enter()
 
 int main(void)
 {
-	esm_boot_routine();
-	
     struct boot_rsp rsp;
     int rc;
 #if defined(CONFIG_BOOT_USB_DFU_GPIO) || defined(CONFIG_BOOT_USB_DFU_WAIT)
@@ -522,6 +520,8 @@ int main(void)
     ZEPHYR_BOOT_LOG_START();
 
     (void)rc;
+
+    esm_boot_routine();
 
     mcuboot_status_change(MCUBOOT_STATUS_STARTUP);
 
@@ -667,6 +667,11 @@ int main(void)
     mcuboot_status_change(MCUBOOT_STATUS_BOOTABLE_IMAGE_FOUND);
 
     ZEPHYR_BOOT_LOG_STOP();
+
+    k_msleep(100);
+    log_backend_notify(log_backend_get_by_name("log_backend_fs"), LOG_BACKEND_EVT_PROCESS_THREAD_DONE, NULL);
+    k_msleep(100);
+
     do_boot(&rsp);
 
     mcuboot_status_change(MCUBOOT_STATUS_BOOT_FAILED);
