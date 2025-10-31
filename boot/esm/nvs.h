@@ -22,6 +22,8 @@
 #define PASSWORD_ID 2
 #define PASSWORD_SIZE 32
 
+#define PASSWORD_DEFAULT "esm2023"
+
 #define IMAGE_CHECK_STATE_TEST 0
 #define IMAGE_CHECK_STATE_TESTED_OK 1
 #define IMAGE_CHECK_STATE_CONFIRMED 2
@@ -29,6 +31,12 @@
 
 #define IMAGE_CHECK_ID 3
 #define IMAGE_CHECK_SIZE 1
+
+#define NVS_APPVERSION_ID 4
+#define NVS_APPVERSION_SIZE 4
+
+#define NVS_BOOTVERSION_ID 5
+#define NVS_BOOTVERSION_SIZE 4
 
 extern uint8_t pwd[PASSWORD_SIZE];
 
@@ -42,5 +50,11 @@ void util_nvs_password_get();
 
 void util_nvs_image_check_state_set(uint8_t state);
 uint8_t util_nvs_image_check_state_get();
+
+void util_nvs_appversion_set(uint32_t appversion);
+ssize_t util_nvs_appversion_get_hist(uint32_t *dat, uint16_t cnt);
+
+void util_nvs_bootversion_set(uint32_t appversion);
+ssize_t util_nvs_bootversion_get_hist(uint32_t *dat, uint16_t cnt);
 
 #endif //NVS_H

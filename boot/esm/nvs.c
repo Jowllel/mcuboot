@@ -8,19 +8,19 @@
 
 #include "nvs.h"
 
+#include <app_version.h>
 #include <zephyr/fs/nvs.h>
 #include <zephyr/kernel.h>
 #include "zephyr/drivers/flash.h"
 #include "zephyr/logging/log.h"
 #include <zephyr/storage/flash_map.h>
-#include "devices.h"
 
 LOG_MODULE_REGISTER(util_nvs, LOG_LEVEL_DBG);
 
 static struct nvs_fs fs;
 
 #define NVS_PARTITION		       storage_partition
-#define NVS_PARTITION_DEVICE	 stmflash
+#define NVS_PARTITION_DEVICE	 DEVICE_DT_GET(DT_ALIAS(stmflash))
 #define NVS_PARTITION_OFFSET	 FIXED_PARTITION_OFFSET(NVS_PARTITION)
 #define NVS_PARTITION_SIZE	   FIXED_PARTITION_SIZE(NVS_PARTITION)
 
@@ -48,6 +48,21 @@ int util_nvs_init(void) {
  if (rc) {
   LOG_ERR("Flash Init failed, rc=%d", rc);
   return -1;
+ }
+
+ uint8_t dummy;
+
+ if (nvs_read(&fs, NVS_BOOTVERSION_ID, &dummy, NVS_BOOTVERSION_SIZE) <= 0)
+ {
+  util_nvs_bootversion_set(APPVERSION);
+  LOG_INF("No NVS Bootversion defined: Setting to the current version: V%d.%d.%d", (APPVERSION>>24)&0xFF, (APPVERSION>>16)&0xFF, (APPVERSION>>8)&0xFF);
+ } else {
+  uint32_t appversion;
+  util_nvs_bootversion_get_hist(&appversion, 0);
+  if (appversion != APPVERSION) {
+   util_nvs_bootversion_set(APPVERSION);
+   LOG_INF("NVS Bootversion set to the new version: V%d.%d.%d", (APPVERSION>>24)&0xFF, (APPVERSION>>16)&0xFF, (APPVERSION>>8)&0xFF);
+  }
  }
 
  return 0;
@@ -108,4 +123,28 @@ uint8_t util_nvs_image_check_state_get() {
  } else {
   return state;
  }
+}
+
+void util_nvs_appversion_set(uint32_t appversion) {
+ int err = nvs_write(&fs, NVS_APPVERSION_ID, &appversion, NVS_APPVERSION_SIZE);
+ if (err < 0) {
+  LOG_ERR("Unable to set appversion in nvs, err %d", err);
+ }
+}
+
+ssize_t util_nvs_appversion_get_hist(uint32_t *dat, uint16_t cnt) {
+ ssize_t size = nvs_read_hist(&fs, NVS_APPVERSION_ID, dat, NVS_APPVERSION_SIZE, cnt);
+ return size;
+}
+
+void util_nvs_bootversion_set(uint32_t bootversion) {
+ int err = nvs_write(&fs, NVS_BOOTVERSION_ID, &bootversion, NVS_BOOTVERSION_SIZE);
+ if (err < 0) {
+  LOG_ERR("Unable to set bootversion in nvs, err %d", err);
+ }
+}
+
+ssize_t util_nvs_bootversion_get_hist(uint32_t *dat, uint16_t cnt) {
+ ssize_t size = nvs_read_hist(&fs, NVS_BOOTVERSION_ID, dat, NVS_BOOTVERSION_SIZE, cnt);
+ return size;
 }
