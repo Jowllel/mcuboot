@@ -26,6 +26,7 @@
 #include "zephyr/drivers/mdio.h"
 #include "zephyr/drivers/rtc.h"
 #include "zephyr/logging/log_output_custom.h"
+#include "app_version.h"
 
 
 BOOT_LOG_MODULE_REGISTER(esm);
@@ -133,6 +134,9 @@ int custom_timestamp_formatter(const struct log_output* output,
 
 void esm_boot_routine()
 {
+	LOG_INF("Bootloader Version (git): "STRINGIFY(APP_BUILD_VERSION));
+	LOG_INF("Bootloader Version: V"APP_VERSION_STRING);
+
 	#if defined(CONFIG_DEVELOPER_MODE)
 		LOG_WRN("Developer Mode Enabled");
 	#endif
